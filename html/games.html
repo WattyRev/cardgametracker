@@ -1,0 +1,4 @@
+<a ng-repeat="game in games" class="game-icon" style="background-image:url(images/{{game.icon}})" ui-sref="{{game.link}}">
+	<h2 ng-hide="game.icon">{{game.name}}</h2>
+</a>
+<div class="clearfix"></div>

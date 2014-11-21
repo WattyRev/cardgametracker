@@ -1,0 +1,182 @@
+<div class="game-menu" id="uno">
+	<button class="button major new" ng-click="new = true;">New Game</button><button class="button major stop" ng-click="stop_game()" ng-show="current_game.started">Stop Game</button>
+	<div class="clearfix"></div>
+	<div id="inactive" ng-hide="current_game.started" class="game-history">
+		<h3>Game History</h3>
+		<p ng-hide="game_history.length">You haven't played any games yet.</p>
+		<ul ng-show="game_history.length">
+			<li class="labels">
+				<span class="date">Date</span><span class="winner">Winner</span>
+			</li>
+			<li ng-repeat="game in game_history">
+				<span class="date">{{game.date | date:'MM/dd/yyyy'}}</span><span class="winner">{{game.winner.player.name}}</span>
+			</li>
+		</ul>
+	</div>
+	<div id="active" ng-show="current_game.started">
+		<ul class="players">
+			<li class="labels">
+				<p class="name">Players</p>
+				<p class="score">Score</p>
+			</li>
+			<li class="player" ng-repeat="person in current_game.scores">
+				<p class="name">{{person.player.name}}</p>
+				<p class="score">{{person.score}}</p>
+				<p class="dealer" ng-show="person.dealer && current_game.settings.track_dealer === 'true'">Dealer</p>
+				<div class="clearfix"></div>
+			</li>
+		</ul>
+		<button class="minor button left" ng-click="undo_round()" ng-class="{disabled: !current_game.scores[0].rounds.length}">Undo Round</button>
+		<button class="major button right" ng-click="end_round()" ng-class="{disabled: current_game.winner}">End Round</button>
+	</div>
+	<button class="info" ng-click="info = true">
+		<svg viewBox="0 0 20 20">
+			<circle fill="none" stroke="#B3B3B3" stroke-miterlimit="10" cx="10" cy="10" r="9.425"/>
+			<path fill="#485BE7" d="M8.597,13.085l-0.041-0.549c-0.127-1.141,0.253-2.389,1.31-3.656c0.952-1.12,1.48-1.945,1.48-2.895
+				c0-1.078-0.676-1.797-2.008-1.818c-0.761,0-1.606,0.254-2.134,0.656L6.695,3.49c0.697-0.507,1.902-0.845,3.022-0.845
+				c2.429,0,3.529,1.501,3.529,3.106c0,1.438-0.804,2.473-1.816,3.678c-0.931,1.099-1.268,2.029-1.205,3.107l0.021,0.549H8.597z
+				M8.132,16.045c0-0.783,0.528-1.332,1.268-1.332s1.246,0.549,1.246,1.332c0,0.74-0.485,1.31-1.267,1.31
+				C8.64,17.355,8.132,16.785,8.132,16.045z"/>
+		</svg>
+	</button>
+	<div class="lightbox" ng-show="new">
+		<div class="lightbox-inner" id="new-game">
+			<button class="cancel" ng-click="new = false">Cancel</button>
+			<h2>New Game</h2>
+			<select-players></select-players>
+			<div id="game-settings">	
+				<h3>Game Settings</h3>
+				<ul>
+					<li>
+						<label for="input-dealer">Track Dealer</label>
+						<input type="checkbox" id="input-dealer" name="dealer" ng-model="track_dealer" ng-true-value="true" ng-false-value="false" ng-checked="true"/>
+					</li>
+					<li>
+						<label for="input-phase">Play To</label>
+						<input type="number" id="input-goal" ng-model="goal" />
+					</li>
+				</ul>
+			</div>
+			<div class="clearfix"></div>
+			<button ng-click="start()" class="button major">Start</button>
+		</div>
+	</div>
+	<div class="lightbox" ng-show="new_round">
+		<div class="lightbox-inner">
+			<button class="cancel" ng-click="new_round = false">Cancel</button>
+			<h3>Round Scores</h3>
+			<ul class="players">
+				<li class="labels">
+					<p class="name">Players</p>
+					<p class="score">Score</p>
+				</li>
+				<li class="player" ng-repeat="person in current_game.scores">
+					<p class="name">{{person.player.name}}</p>
+					<p class="score"><input type="number" name="score" ng-model="person.round_score" ng-focus="person.round_score = ''" /></p>
+					<div class="clearfix"></div>
+				</li>
+			</ul>
+			<button class="button major" ng-click="save_round()">Save</button>
+		</div>
+	</div>
+	<div class="lightbox" ng-show="game_over">
+		<div class="lightbox-inner">
+			<button class="cancel" ng-click="game_over = false">Close</button>
+			<h3>Game Over</h3>
+			<p>{{message}}</p>
+			<button class="button major" ng-click="current_game = {}; 
+		game_over = false;">Done</button>
+		</div>
+	</div>
+	<div class="lightbox" ng-show="info">
+		<div class="lightbox-inner">
+			<button class="cancel" ng-click="info = false">Close</button>
+			<h2>About UNO</h2>
+			<h3>Ages</h3>
+			<p>7 and over.</p>
+			<h3>Players</h3>
+			<p>2 to 10</p>
+			<h3>Object</h3>
+			<p>To be the first player to score 500 points. Points are scored by ridding yourself of all the cards in your hand before your opponent(s). You score points for cards left in your opponent's hands.</p>
+			<h3>You Should Have</h3>
+			<p>108 cards as follows:</p>
+			<ul>
+				<li>19 Blue Cards - 0 to 9</li>
+				<li>19 Green Cards - 0 to 9</li>
+				<li>19 Red Cards - 0 to 9</li>
+				<li>19 Yellow Cards - 0 to 9</li>
+				<li>8 Draw Two cards - 2 each in Blue, Green, Red and Yellow</li>
+				<li>8 Reverse Cards - 2 each in Blue, Green, Red and Yellow</li>
+				<li>8 Skip Cards - 2 each in Blue, Green, Red and Yellow</li>
+				<li>4 Wild Cards</li>
+				<li>4 Wild Draw 4 cards</li>
+				<li>4 Blank Cards in each color [new decks]</li>
+			</ul>
+			<blockquote>[Please remove all components from the package and compare them to the parts list. If any items are missing please call 1-800-524-TOYS.]</blockquote>
+			<p>Okay, now grab a bag of potato chips and something to wash them down with.</p>
+			<h3>UNO In a Nutshell</h3>
+			<p>Each player is dealt 7 cards with the remaining ones placed face down to form a DRAW pile. The top card of the DRAW pile is turned over to begin a DISCARD pile.</p>
+			<p>The first player has to match the card in the DISCARD pile either by number, color or word. For example, if the card is a red 7, player must throw down a red card or any color 7. Or the player can throw down a Wild Card. If the player doesn't have anything to match, he must pick a card from the DRAW pile. If he can play what is drawn, great. Otherwise play moves to the next person.</p>
+			<p>When you have one card left, you must yell "UNO" (meaning one). Failure to do this results in you having to pick two cards from the DRAW pile. That is, of course if you get caught by the other players.</p>
+			<p>Once a player has no cards left, the hand is over. Points are scored (see scoring section) and you start over again. That's UNO in a nutshell.</p>
+			<h3>Now for the Details</h3>
+			<h3>Choosing a Dealer</h3>
+			<p>Each player picks a card. The player who picks the highest number deals. If you picked a "word" card, too bad, they don't count. Player to the left of the dealer starts play. Or, you could use the Track Dealer feature to keep track of this for you.</p>
+			<h3>Starting a Discard Pile</h3>
+			<p>Well, if a word card is the first one turned up from the DRAW pile, this is what happens.</p>
+			<ul>
+				<li><strong>Wild Draw Four</strong> - It's put back in the deck and another one is chosen.</li>
+				<li><strong>Wild Card</strong> - The player to the left of the dealer calls out a color</strong> - then plays.</li>
+				<li><strong>Draw Two Card</strong> - The player to the left of dealer must pick two cards and then the next player goes (sad, but true).</li>
+				<li><strong>Reverse Card</strong> - The dealer plays first, but then goes to the right instead of the left.</li>
+				<li><strong>Skip Card</strong> - The player to the left of dealer doesn't start (get it, he's skipped). The player to the left of him starts.</li>
+			</ul>
+			<h3>What Word Cards Mean</h3>
+			<ul>
+				<li><strong>Draw Two Cards</strong> - When this card is played, the next person to play must draw 2 cards and forfeit his turn.</li>
+				<li><strong>Reverse Card</strong> - Simply reverse direction of play. Play left becomes play right, and vice versa.</li>
+				<li><strong>Skip Card</strong> - The next player to play loses his turn and is "skipped." Mighty clever.</li>
+				<li><strong>Wild Card</strong> - This card can be played on any card. The person playing the card calls any color to continue play, including the one presently being played if desired. A Wild card can be played even if the player has another playable card in his hand.</li>
+				<li><strong>Wild Draw Four Card</strong> - This is the best, meanest, most sneaky card to have. Not only does the player get to call the next color played, but the next player has to pick 4 cards and forfeit his turn. There is a hitch, however (of course): you can only play this card when you don't have a card in your hand that matches the color of the card previously played.</li>
+			</ul>
+			<blockquote>Note: A player may have a matching number or word card of a different color in his hand and plays his "Wild Draw Four" card.</blockquote>
+			<h4>What Are These Extra Cards For?</h4>
+			<p><strong>Blank Card</strong> - This is a special card that you may use in one of two ways. If a card from your UNO deck is lost or damaged you may use the Blank Card as a replacement. Example: If you find that your deck is missing one of the yellow 7's you would simply replace it by taking the yellow Blank Card, marking a "7" on it and adding it back into the deck.</p>
+			<p>If your family has a special UNO rule you prefer to play with you may write that rule on the Blank Cards and add them straight to the deck</p>
+			<h3>Going Out</h3>
+			<p>A player who forgets to say UNO before his card touches the discard pile, but "catches" himself before any other player catches him, is safe and is not subject to the penalty. You may not catch a player for failure to say UNO until his second to last card touches the DISCARD pile. Also, you may not catch a player for failure to say UNO after the next player begins his turn. "Beginning a turn is defines as either drawing a card from the DRAW pile or drawing a card from your hand to play.</p>
+			<p>If the last card played in a hand is a Draw Two or Wild Draw Four card, the next player must draw the two or four cards. These cards are counted when points are totaled.</p>
+			<p>If no one is out of cards by the time the DRAW pile is depleted, reshuffle and continue play.</p>
+			<h4>Scoring</h4>
+			<p>When a player is out of cards, he gets points for cards left in the opponent's hands as follows:</p>
+			<ul>
+				<li>All cards through 9 Face value</li>
+				<li>Draw 2 = 20 points</li>
+				<li>Reverse = 20 points</li>
+				<li>Skip = 20 points</li>
+				<li>Wild = 50 points</li>
+				<li>Wild Draw 4 = 50 points</li>
+			</ul>
+			<p>The WINNER is the first player to reach 500 points. However, the game may be scored by keeping a running total of points of each player is caught with at the end of each hand. When one player reaches 500 points, the player with the lowest points is the winner.</p>
+			<h3>Reneging</h3>
+			<p>A player may choose not to play a playable card from his hand. If so, the player must draw a card from the DRAW pile. If playable, that card can be played, but the player may not play a card from his hand after the draw.</p>
+			<h3>What Would a Game Be Without Penalties</h3>
+			<p>If a player makes a card suggestion to another player, he must draw 4 cards.</p>
+			<p>If a player plays a Wild Draw 4 card illegally and gets caught, he must first show his hand to the player who challenged. If guilty, he must draw 4 cards. If not guilty, the challenger must draw 2 cards in addition to the 4. The challenge can only be made by the person required to draw the four cards.</p>
+			<h3>Two-Handed Play, Partners and Multi-Table Tournaments</h3>
+			<p>Rules for Two Players - Play UNO with two players with the following special rules:</p>
+			<ol>
+				<li>Playing a Reverse card acts like a Skip. The player who plays the Reverse may immediately play another card.</li>
+				<li>The person playing a Skip card may immediately play another card.</li>
+				<li>When a Draw Two card is played and your opponent has drawn two cards, the play is back to you. The same principle applies to the Wild Draw Four card. Regular UNO rules apply in all other other instances.</li>
+			</ol>
+
+			<p><strong>Partners - Four Players</strong> - Sit across from your partner. When either partner goes out, the hand is over. Total all of the points in both opposing partner's hands and score for the winning team.</p>
+			<p><strong>Variation</strong> - With four players, play four hands with each of the other three players as your partner (a total of 12 hands). Each player keeps track of his points scored in each partnership. Play several rounds, with the person scoring the highest number of points declared the winner.</p>
+			<p>With eight players, play two separate games at two tables, with each player having every other player as a partner for four hands each (a total of 28 hands). Score as above.</p>
+			<p><strong>4-6-8-10 Players</strong> - If several couples wish to play "UNO" seat them alternately, one man, one woman, etc., and play the men versus the women. Once a man or woman goes out, all teammates throw in their cards and the opposing team totals the points in all of their hands. First team to accumulate 500 points is the winner.</p>
+			<p><strong>Challenge UNO</strong> - This game is scored by keeping a running total of what each player is caught with in his hand. As each player reaches a designated amount, we suggest 500, he is eliminated from the game. When only two players are left in the game, they play head to head. When a player reaches or exceeds the amount designated, he loses. The winner of that final hand is declared the winning player of the game. (See special rules for two-handed UNO). THE MAKERS OF UNO FIND THIS VARIATION THE MOST CHALLENGING WAY TO PLAY.</p>
+			<p>Well that about sums it up. Enjoy UNO - and may the luckiest player win! ©1993 International Games, Inc. a Mattel Company All Rights Reserved</p>
+		</div>
+	</div>
+</div>

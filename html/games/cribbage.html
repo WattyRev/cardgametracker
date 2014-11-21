@@ -1,0 +1,275 @@
+<div class="game-menu">
+	<button class="button major new" ng-click="new = true;">New Game</button><button class="button major stop" ng-click="stop_game()" ng-show="current_game.started">Stop Game</button>
+	<div class="clearfix"></div>
+	<div id="inactive" ng-hide="current_game.started" class="game-history">
+		<h3>Game History</h3>
+		<p ng-hide="game_history.length">You haven't played any games yet.</p>
+		<ul ng-show="game_history.length">
+			<li class="labels">
+				<span class="date">Date</span><span class="winner">Winner</span>
+			</li>
+			<li ng-repeat="game in game_history">
+				<span class="date">{{game.date | date:'MM/dd/yyyy'}}</span><span class="winner">{{game.winner.player.name}}</span>
+			</li>
+		</ul>
+	</div>
+	<div id="active" ng-show="current_game.started">
+		<div class="visual">
+			<p class="skunk">S</p>
+			<p class="double-skunk">DS</p>
+			<div class="bar" ng-repeat="person in current_game.scores">
+				<div class="fill" style="width: {{person.points / 121 * 100}}%"><p>{{person.player.name}}</p></div>
+			</div>
+		</div>
+		<ul class="players three">
+			<li class="labels">
+				<p class="name">Players</p>
+				<p class="score">Score</p>
+			</li>
+			<li class="player" ng-repeat="person in current_game.scores">
+				<p class="name">{{person.player.name}}</p>
+				<p class="score"><button class="button minor mono" ng-click="subtract(person)">-</button>{{person.points}}<button class="button minor mono" ng-click="add(person)">+</button></p>
+				<button class="button minor" ng-click="add_hand(person, 'hand')" ng-show="!person.scored_hand">Add Hand</button>
+				<button class="button minor" ng-click="add_hand(person, 'crib')" ng-show="person.scored_hand && !person.scored_crib && person.dealer">Add Crib</button>
+				<p class="dealer" ng-show="person.dealer && current_game.settings.track_dealer === 'true'">Dealer</p>
+				<div class="clearfix"></div>
+			</li>
+		</ul>
+	</div>
+	<button class="info" ng-click="info = true">
+		<svg viewBox="0 0 20 20">
+			<circle fill="none" stroke="#B3B3B3" stroke-miterlimit="10" cx="10" cy="10" r="9.425"/>
+			<path fill="#485BE7" d="M8.597,13.085l-0.041-0.549c-0.127-1.141,0.253-2.389,1.31-3.656c0.952-1.12,1.48-1.945,1.48-2.895
+				c0-1.078-0.676-1.797-2.008-1.818c-0.761,0-1.606,0.254-2.134,0.656L6.695,3.49c0.697-0.507,1.902-0.845,3.022-0.845
+				c2.429,0,3.529,1.501,3.529,3.106c0,1.438-0.804,2.473-1.816,3.678c-0.931,1.099-1.268,2.029-1.205,3.107l0.021,0.549H8.597z
+				M8.132,16.045c0-0.783,0.528-1.332,1.268-1.332s1.246,0.549,1.246,1.332c0,0.74-0.485,1.31-1.267,1.31
+				C8.64,17.355,8.132,16.785,8.132,16.045z"/>
+		</svg>
+	</button>
+	<div class="lightbox" ng-show="new">
+		<div class="lightbox-inner" id="new-game">
+			<button class="cancel" ng-click="new = false">Cancel</button>
+			<h2>New Game</h2>
+			<select-players></select-players>
+			<div id="game-settings">	
+				<h3>Game Settings</h3>
+				<ul>
+					<li>
+						<label for="input-dealer">Track Dealer</label>
+						<input type="checkbox" id="input-dealer" name="dealer" ng-model="track_dealer" ng-true-value="true" ng-false-value="false" ng-checked="true"/>
+					</li>
+				</ul>
+			</div>
+			<div class="clearfix"></div>
+			<button ng-click="start()" class="button major">Start</button>
+		</div>
+	</div>
+	<div class="lightbox" ng-show="game_over">
+		<div class="lightbox-inner">
+			<button class="cancel" ng-click="game_over = false">Close</button>
+			<h3>Game Over</h3>
+			<p>{{message}}</p>
+			<button class="button major" ng-click="current_game = {}; 
+		game_over = false;">Done</button>
+		</div>
+	</div>
+	<div class="lightbox" ng-show="add_score">
+		<div class="lightbox-inner">
+			<button class="cancel" ng-click="add_score = false">Close</button>
+			<h3 class="center">How many points?</h3>
+			<input class="center" type="number" ng-model="add_score_value" ng-focus="add_score_value = ''" ng-blur="add_score_value === '' ? add_score_value = 0 : add_score_value = add_score_value"/>
+			<button class="button major" ng-click="save(add_score)">Save</button>
+		</div>
+	</div>
+	<div class="lightbox" ng-show="info">
+		<div class="lightbox-inner">
+			<button class="cancel" ng-click="info = false">Close</button>
+			<h2>About Cribbage</h2>
+			<h3>Object of the Game</h3>
+			<p>Be the first player to score 121 points.</p>
+			<h3>Number of Players</h3>
+			<p>The basic game is for two players, and these rules apply to only the two-handed game in tournaments sanctioned by the ACC. Three-handed and four-handed versions of the game are played with essentially the same rules.</p>
+			<h3>The Cards</h3>
+			<ul>
+				<li>A standard pack of 52 playing cards is used. (Jokers are discarded.)</li>
+				<li>The four suits are considered equal.</li>
+				<li>The rank and value of the cards are as follows:
+					<table>
+						<tbody>
+							<tr>
+								<td>Card:</td>
+								<td>K</td>
+								<td>Q</td>
+								<td>J</td>
+								<td>10</td>
+								<td>9</td>
+								<td>8</td>
+								<td>7</td>
+								<td>6</td>
+								<td>5</td>
+								<td>4</td>
+								<td>3</td>
+								<td>2</td>
+								<td>A</td>
+							</tr>
+							<tr>
+								<td>Value:</td>
+								<td>10</td>
+								<td>10</td>
+								<td>10</td>
+								<td>10</td>
+								<td>9</td>
+								<td>8</td>
+								<td>7</td>
+								<td>6</td>
+								<td>5</td>
+								<td>4</td>
+								<td>3</td>
+								<td>2</td>
+								<td>1</td>
+							</tr>
+						</tbody>
+					</table>
+				</li>
+			</ul>
+			<h3>The Cribbage Board</h3>
+			<p>The cribbage board is used to show the score accumulated by each player during the play of a game (front peg) and the amount of the latest incremental score (difference between front and rear pegs).</p>
+			<h3>Outline of Playing Sequence</h3>
+			<p>The following listed sequence is an outline of the actions performed in playing a game of cribbage and is intended for the benefit of those learning the game. It does not include any detailed playing rules, which are specified elsewhere in rule 1 and thereafter.</p>
+			<ul>
+				<li>The pack is cut to determine which player will deal first in the first game of a match; the low card wins the deal. Thereafter the loser of the previous game deals first.</li>
+				<li>The dealer shuffles and, after a mandatory cut by the pone (non-dealer), distributes one card alternately to each player, beginning with the pone, until each has six cards.</li>
+				<li>Each player discards two cards to form the crib, which belongs to the dealer.</li>
+				<li>The pone cuts the remainder of the pack to select a starter card, which is used in counting the value of each player's hand and the crib.</li>
+				<li>Play of the cards:
+					<ol>
+						<li>Players alternately play (place face up on the table) one card at a time, starting with the pone. The cumulative value of the cards played is announced as each card is played.</li>
+						<li>When a player cannot play a card without the cumulative total exceeding 31, that player calls "go", and the opponent continues to play all cards possible (not exceeding a 31-count). The player who calls "go" plays first in the following 31-count sequence.</li>
+						<li>Points are scored during this play of the cards (see scoring chart in rule 1.7).</li>
+					</ol>
+				</li>
+				<li>When both players have played all their cards, the pone's hand is counted and pegged by the pone (see scoring chart). The dealer then does the same for the dealer's hand and then for the crib.</li>
+				<li>The deal alternates between the players until the game ends, which occurs when a player scores 121 points</li>
+			</ul>
+			<h3>Definitions</h3>
+			<p><strong>Crib:</strong> Four cards (two from each player) set aside for the dealer to score after the dealer's hand.</p>
+			<p><strong>Cut card:</strong> (1) The starter card or (2) the card cut by either player at the start of the game or match to determine the dealer.</p>
+			<p><strong>Flush:</strong> Four cards of the same suit held in the hand count four points; five cards of the same suit (including the starter card) count five points in the hand or crib.</p>
+			<p><strong>Game hole:</strong>Hole number 121.</p>
+			<p><strong>Go:</strong> Called by a player who cannot play a card without exceeding the cumulative count of 31; the opponent scores one point, or two if reaching exactly 31.</p>
+			<p><strong>Hand:</strong> The six cards dealt to each player or the four cards remaining after discarding to the crib.</p>
+			<p><strong>His heels (nibs):</strong> Jack, when it is the starter card, counts two points for the dealer.</p>
+			<p><strong>His nobs:</strong> Jack of the same suit as the starter card, either in the hand or crib, counts one point.</p>
+			<p><strong>Judge:</strong> A person authorized by the ACC or the tournament director to answer questions and settle disagreements between players relating to the rules of play.</p>
+			<p><strong>Match:</strong> One or more games between two players, the outcome of which is a match winner and a match loser. The play of one or more games between two players during tournament qualification play does not constitute a match.</p>
+			<p><strong>Muggins:</strong> The scoring of certain points that one's opponent fails to peg. It has no relationship to penalties. Muggins is played at the option of the tournament director, but must be listed on a sanctioned tournament flyer and announced prior to the beginning of play.</p>
+			<p><strong>Pair:</strong> Two cards of the same rank, such as two Aces.</p>
+			<p><strong>Peg:</strong> (1) A small marker that fits into the holes of a cribbage board and is used for scoring. (2) To record a score by advancing the rear peg in front of the front peg.</p>
+			<p><strong>Pegging:</strong> The recording of scored points by advancing the rear peg in front of the front peg and releasing it.</p>
+			<p><strong>Pone:</strong> The opponent of the player who deals.</p>
+			<p><strong>Score:</strong> Any points earned by a player.</p>
+			<p><strong>Scoring:</strong> The earning of points.</p>
+			<p><strong>Shuffle:</strong> A random mixing of the cards, which could include riffling.</p>
+			<p><strong>Skunk:</strong> To win by 31 or more points.</p>
+			<p><strong>Skunk, double:</strong> To win by 61 or more points.</p>
+			<p><strong>Starter card:</strong> The card that is cut and placed on the remainder of the pack and is used in counting the value of each hand and the crib.</p>
+			<p><strong>Stink hole:</strong> Hole number 120, which is one short of the game hole.</p>
+			<p><strong>Straight (or run), single:</strong> Sequence of three or more consecutive cards in any order during the play of the cards; for example, 3, 5, 6, 7, 4 (counts three when the 7 is played and counts five when the 4 is played).</p>
+			<p><strong>Straight, multiple:</strong> (used only in counting hands and crib):
+				<ul>
+					<li><strong>Double run:</strong> Two three-card or four-card straights, including one pair; for example, A, 2, 3, 3 or A, 2, 3, 3, 4.</li>
+					<li><strong>Double-double run:</strong> Four three-card straights, including two pairs; for example, 8, 8, 9, 9, 10.</li>
+					<li><strong>Triple run:</strong> Three three-card straights including three of a kind; for example, J, Q, Q, Q, K.</li>
+				</ul>
+			</p>
+			<p><strong>Street:</strong> A stretch of 30 holes on the game board. First street consists of holes 1-30, second street of holes 31-60, third street of holes 61-90, and fourth street of holes 91-120.</p>
+			<h3>Scoring Chart</h3>
+			<table>
+				<thead>
+					<tr>
+						<th></th>
+						<th colspan="2">Points Earned</th>
+					</tr>
+					<tr>
+						<th>Cards</th>
+						<th>During Play</th>
+						<th>Hand or Crib</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>Jack turned by dealer as starter card</td>
+						<td>2</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>Jack in hand or crib of same suit as starter card</td>
+						<td>-</td>
+						<td>1</td>
+					</tr>
+					<tr>
+						<td><strong>Combinations:</strong></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Two of a Kind (Pair)</td>
+						<td>2</td>
+						<td>2</td>
+					</tr>
+					<tr>
+						<td>Three of a Kind (Triple)</td>
+						<td>6</td>
+						<td>6</td>
+					</tr>
+					<tr>
+						<td>Four of a Kind (Quadruple)</td>
+						<td>12</td>
+						<td>12</td>
+					</tr>
+					<tr>
+						<td>Straights of three or more cards: per card</td>
+						<td>1</td>
+						<td>1</td>
+					</tr>
+					<tr>
+						<td>15-count (sum of any combination of cards)</td>
+						<td>-</td>
+						<td>2</td>
+					</tr>
+					<tr>
+						<td>Four-card Flush (only in the hand)</td>
+						<td>-</td>
+						<td>4</td>
+					</tr>
+					<tr>
+						<td>Five-card Flush</td>
+						<td>-</td>
+						<td>5</td>
+					</tr>
+					<tr>
+						<td>Reaching a 15-count exactly</td>
+						<td>2</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>*Reaching a 31-count exactly</td>
+						<td>2</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>*"Go" (without reaching 31-count)</td>
+						<td>1</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>*Final card played (without reaching 31-count)</td>
+						<td>1</td>
+						<td>-</td>
+					</tr>
+				</tbody>
+			</table>
+			<p><i>* Only one of these scores can be earned with the play of a single card.</i></p>
+		</div>
+	</div>
+</div>

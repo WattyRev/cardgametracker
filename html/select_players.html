@@ -1,0 +1,7 @@
+<h3>Players</h2>
+<ul>
+	<li ng-repeat="(i, player) in players">
+		<label for="input-{{player.name}}">{{player.name}}</label>
+		<input type="checkbox" id="input-{{player.name}}" class="select-player" ng-checked="player.prev" value="{{player}}"/>
+	</li>
+</ul>

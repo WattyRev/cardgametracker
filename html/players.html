@@ -1,0 +1,23 @@
+<div class="message" ng-hide="$root.players.length">
+	Looks like you have not set up any players yet! Why don't you do that now:
+	<button class="button major" ng-click="add = true">Add Player</button>
+</div>
+<ul class="players" ng-show="$root.players.length">
+	<li class="player" ng-repeat="player in $root.players">
+		<p class="content">{{player.name}}<br/>
+		Created: {{player.since | date:'MM/dd/yyyy'}}</p>
+		<button class="edit" ng-click="edit.player = player; edit.show = true;">Edit</button>
+		<button class="delete" ng-click="delete_player(player)">Delete</button>
+		<div class="clearfix"></div>
+	</li>
+</ul>
+<button class="button minor add" ng-show="$root.players.length" ng-click="add = true">Add New Player</button>
+<div class="add-window lightbox" ng-show="add || edit.show">
+	<div class="lightbox-inner">
+		<button class="cancel" ng-click="add = false; edit.show = false">Cancel</button>
+		<label for="add-name">What is the person's name?</label>
+		<input type="text" name="name" id="input-name" ng-model="name" autocomplete="off"/>
+		<button class="button major save" ng-show="edit.show" ng-click="save_player(edit.player)">Save</button>
+		<button class="button major save" ng-show="add" ng-click="add_player()">Save</button>
+	</div>
+</div>

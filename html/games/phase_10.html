@@ -1,0 +1,148 @@
+<div class="game-menu">
+	<button class="button major new" ng-click="new = true;">New Game</button><button class="button major stop" ng-click="stop_game()" ng-show="current_game.started">Stop Game</button>
+	<div class="clearfix"></div>
+	<div id="inactive" ng-hide="current_game.started" class="game-history">
+		<h3>Game History</h3>
+		<p ng-hide="game_history.length">You haven't played any games yet.</p>
+		<ul ng-show="game_history.length">
+			<li class="labels">
+				<span class="date">Date</span><span class="winner">Winner</span>
+			</li>
+			<li ng-repeat="game in game_history">
+				<span class="date">{{game.date | date:'MM/dd/yyyy'}}</span><span class="winner">{{game.winner.player.name}}</span>
+			</li>
+		</ul>
+	</div>
+	<div id="active" ng-show="current_game.started">
+		<ul class="players">
+			<li class="labels">
+				<p class="name">Players</p>
+				<p class="phase">Phase</p>
+				<p class="score">Score</p>
+			</li>
+			<li class="player" ng-repeat="person in current_game.scores">
+				<p class="name">{{person.player.name}}</p>
+				<p class="phase">{{person.phase}}</p>
+				<p class="score">{{person.score}}</p>
+				<p class="dealer" ng-show="person.dealer && current_game.settings.track_dealer === 'true'">Dealer</p>
+				<p class="description" ng-show="current_game.settings.phase_rules === 'true'">{{current_game.phases[person.phase - 1]}}</p>
+				<div class="clearfix"></div>
+			</li>
+		</ul>
+		<button class="minor button left" ng-click="undo_round()" ng-class="{disabled: !current_game.scores[0].rounds.length}">Undo Round</button>
+		<button class="major button right" ng-click="end_round()" ng-class="{disabled: current_game.winner}">End Round</button>
+	</div>
+	<button class="info" ng-click="info = true">
+		<svg viewBox="0 0 20 20">
+			<circle fill="none" stroke="#B3B3B3" stroke-miterlimit="10" cx="10" cy="10" r="9.425"/>
+			<path fill="#485BE7" d="M8.597,13.085l-0.041-0.549c-0.127-1.141,0.253-2.389,1.31-3.656c0.952-1.12,1.48-1.945,1.48-2.895
+				c0-1.078-0.676-1.797-2.008-1.818c-0.761,0-1.606,0.254-2.134,0.656L6.695,3.49c0.697-0.507,1.902-0.845,3.022-0.845
+				c2.429,0,3.529,1.501,3.529,3.106c0,1.438-0.804,2.473-1.816,3.678c-0.931,1.099-1.268,2.029-1.205,3.107l0.021,0.549H8.597z
+				M8.132,16.045c0-0.783,0.528-1.332,1.268-1.332s1.246,0.549,1.246,1.332c0,0.74-0.485,1.31-1.267,1.31
+				C8.64,17.355,8.132,16.785,8.132,16.045z"/>
+		</svg>
+	</button>
+	<div class="lightbox" ng-show="new">
+		<div class="lightbox-inner" id="new-game">
+			<button class="cancel" ng-click="new = false">Cancel</button>
+			<h2>New Game</h2>
+			<select-players></select-players>
+			<div id="game-settings">	
+				<h3>Game Settings</h3>
+				<ul>
+					<li>
+						<label for="input-dealer">Track Dealer</label>
+						<input type="checkbox" id="input-dealer" name="dealer" ng-model="track_dealer" ng-true-value="true" ng-false-value="false" ng-checked="true"/>
+					</li>
+					<li>
+						<label for="input-phase">Show Phase Descriptions</label>
+						<input type="checkbox" id="input-phase" ng-model="phase_rules" ng-true-value="true" ng-false-value="false" ng-checked="true" />
+					</li>
+					<li>
+						<label for="input-mixed">Play Mixed Game</label>
+						<input type="checkbox" id="input-mixed" ng-model="mixed_game" ng-true-value="true" ng-false-value="false" ng-checked="false" />
+					</li>
+				</ul>
+			</div>
+			<div class="clearfix"></div>
+			<button ng-click="start()" class="button major">Start</button>
+		</div>
+	</div>
+	<div class="lightbox" ng-show="new_round">
+		<div class="lightbox-inner">
+			<button class="cancel" ng-click="new_round = false">Cancel</button>
+			<h3>Round Scores</h3>
+			<ul class="players">
+				<li class="labels">
+					<p class="name">Players</p>
+					<p class="phase">Passed Phase</p>
+					<p class="score">Score</p>
+				</li>
+				<li class="player" ng-repeat="person in current_game.scores">
+					<p class="name">{{person.player.name}}</p>
+					<p class="phase"><input type="checkbox" name="pass_phase" ng-model="person.pass_phase" ng-true-value="true" ng-false-value="false"/></p>
+					<p class="score"><input type="number" name="score" ng-model="person.phase_score" ng-focus="person.phase_score = ''" ng-blur="person.phase_score === '' ? person.phase_score = 0 : person.phase_score = person.phase_score" /></p>
+					<div class="clearfix"></div>
+				</li>
+			</ul>
+			<button class="button major" ng-click="save_round()">Save</button>
+		</div>
+	</div>
+	<div class="lightbox" ng-show="game_over">
+		<div class="lightbox-inner">
+			<button class="cancel" ng-click="game_over = false">Close</button>
+			<h3>Game Over</h3>
+			<p>{{message}}</p>
+			<button class="button major" ng-click="current_game = {}; 
+		game_over = false;">Done</button>
+		</div>
+	</div>
+	<div class="lightbox" ng-show="info">
+		<div class="lightbox-inner">
+			<button class="cancel" ng-click="info = false">Close</button>
+			<h2>About Phase 10</h2>
+			<h3>Object</h3>
+			<p>To be the first player to complete all 10 Phases. In case of a tie, the player with the lowest score is the winner.</p>
+			<h3>Equipment</h3>
+			<p>PHASE 10 reference cards (listing the 10 Phases) and one deck of 108 cards: 24 each of red, orange, yellow, and green cards numbered "1 " through "12 ", and four "Skip " cards and eight "wild " cards.</p>
+			<h3>Play</h3>
+			<p>One player is chosen to be the dealer, who shuffles the deck and deals out a hand of 10 cards, one at a time and face down, to each player. Players hold their 10 cards in hand, so that other players cannot see them. The remaining deck is placed face down in the center of the play area, to become the draw pile. The top card of the draw pile is turned over and placed next to the draw pile, to become the discard pile.</p>
+			<p>Play begins with the player to the left of the dealer, and progresses to the left. In turn, a player draws one card-either the top card from the draw pile or the top card from the discard pile-and adds it to the player's hand. The player ends the turn by discarding one card of choice onto the discard pile.</p>
+			<p>Play of the first hand begins, with each player trying to complete the first Phase of the 10 Phases. Each player can make only one Phase during the play of a hand. Phases are made of sets, runs, cards all of one color, or a combination of sets and runs.</p>
+			<h3>Definitions</h3>
+			<p><strong>Sets:</strong> A set is made of two or more cards with the same number showing on their face. EXAMLE: Phase 1 consists of 2 sets of 3, which could be 3 "7's " and 3 "10's ". The cards can be in any combination of colors.</p>
+			<p><strong>Runs:</strong> A run is made of four or more cards numbered in order. EXAMPLE: Part of Phase 2 requires a run of 4, which could be "3 ", "4 ", "5 ", "6 ". The cards can be in any combination of colors. ALL ONE COLOR: The cards are all the same color.<br/>
+			<blockquote>EXAMPLE: Phase 8 requires 7 cards of one color, which could be 7 red cards or 7 green cards etc.</blockquote></p>
+			<p><strong>Wild Card:</strong> A "Wild" card may be used in place of a number card in order to complete a Phase. A "Wild " card also maybe used as any color, to complete Phase 8.<br/>
+			<blockquote>EXAMPLES: A player wants to make a run of 4, but only has cards "3 ", "4 ", and "6 ". The player uses a "Wild " card as a "5 " to complete the run. Or, a player has 6 green cards, and uses a "Wild " card as a green card, to complete Phase 8.</blockquote><br/>
+			<blockquote>NOTE: More than one "Wild " card may be used in completing a Phase. Once a "Wild " card has been played as a certain card in a Phase it cannot be replaced by the intended card and used elsewhere, but must remain as that card until the hand is over.</blockquote>
+			<p><strong>Skip Cards:</strong> When discarded, a "Skip " card causes another player to lose their next turn. The player who discards the "Skip " card chooses the player who loses their turn. When a player draws a "Skip " card, the player may discard it immediately or save it for a later turn. A "Skip " card may never be used in making Phase 8, or any other Phase. A "Skip " card may never be picked up from the discard pile.<br/>
+			A player may lay down more than the minimum requirements of a Phase, but only if the additional cards can be directly added to the cards already in the Phase.<br/>
+			<blockquote>EXAMPLES: A player making Phase 1 lays down 3 "5's " and 3 "7's ". The player has 2 more "5's " in hand and can immediately lay them down with the 3 "5's ", all in the same turn. Another player making Phase 1 lays down 3 "6's " and 3 "8's ". The player also has 3 "10's " in hand, but cannot lay them down because Phase 1 requires exactly 2 sets. Thus, the player can only add more "6's " and "8's " to their Phase made of "6's " and "8's ". Only one Phase can be made per hand.</blockquote><br/>
+			If a player successfully makes a Phase in a hand, then the player must try to make the next Phase in a hand. If a player fails to make a Phase in a hand, the player must try to make the same Phase again in the next hand. Thus, some players, in the next hand, may no longer be working on the same Phase as other players.<br/>
+			A player may never make a Phase out of order. For example, a player trying to make Phase 4 (1 run of 7) lays down a run of 9 cards. This qualifies as 1 run of 7 for Phase 4, but cannot be used as credit for either Phase 5 (1 run of 8) or Phase 6 (1 run of 9).<br/>
+			A player receives credit for making a Phase as soon as the player lays down that Phase. The player does not need to win the hand in order to receive credit for the Phase. Several players will often complete a Phase in the same hand.
+			<p><strong>Hitting:</strong> Hitting is the way to get rid of leftover cards in the hand after making a Phase. A player makes a hit by laying down a card directly on a Phase already laid down. The card must properly fit in with the cards already down.<br/>
+			<blockquote>EXAMPLES: A player may add one or more "4's " to a player's existing set of "4's ". A player may add a "2 " to a player's existing run of "3 ", "4 ", "5 ", "6 "-the player may also add a "7 " and an "8 " to this run, if the player has them. A player may add one or more green cards to a player's 7 green cards in Phase 8. A player may add a "Wild " card of any color to any of these card situations.</blockquote><br/>
+			Before a player can make a hit, the player's own Phase must already be laid down. A player may hit only during the player's turn A player may hit the player's own cards or another player's cards or both</p>
+			<p><strong>Going Out:</strong> The player who gets rid of the last card in hand, by discarding or hitting, is said to go out. This player wins the hand. The winner of the hand, and any other players who also complete their Phase, will advance to the next Phase for the next hand.</p>
+			<p><strong>Scoring:</strong>A running total for each player is kept. The winner of the hand scores zero. All remaining players score points against them, for cards still in hand, as follows:</p>
+			<ul>
+				<li>5 points for each card numbered 1-9.</li>
+				<li>10 points for each card numbered 10-12 </li>
+				<li>15 points for each "Skip " card </li>
+				<li>25 points for each "Wild " card </li>
+			</ul>
+			<p>Only cards in hand are scored, not cards already laid down<br/>
+			After the scores are recorded, the player to the left of the dealer becomes the new dealer. All cards are gathered and shuffled, and a new hand is dealt.</p>
+			<h3>The Winner</h3> 
+			<p>When, at the end of a hand, a player has completed Phase 10, that player is declared the winner, If two or more players complete Phase 10 in the same hand, then the player with the fewest total points is the winner. In the event of a tie, the players that tied replay Phase number 10. The first one to go out is the winner.</p>
+			<h3>Variations</h3>
+			<ol>
+				<li>The players play 10 hands. All players advance to the next Phase each time, whether they complete the current Phase or not. Thus, in Hand 1 players try for Phase 1, then in Hand 2 they all try for Phase 2, etc. After 10 hands, the player with the lowest total score is the winner.</li>
+				<li>Players decide how many Phases must be completed in order to win (e.g., 5 Phases or 7 Phases). The number of Phases to be completed must be decided before play starts. All other rules remain the same. This variation allows for a shorter version.</li>
+				<li>Players decide to play only the even Phases (2, 4, 6, 8, 10) instead of all the Phases. All other rules remain the same.</li>
+			</ol>
+		</div>
+	</div>
+</div>

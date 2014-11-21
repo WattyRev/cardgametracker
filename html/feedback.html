@@ -1,0 +1,18 @@
+<p>If you have an suggestions or would like to request a game to be added to this app, feel free to use the form below to send me a message. This app is a personal side project, so I cannot guarantee that I will fulfill your request, but I will try my hardest to do so.</p>
+<form ng-submit="submit()">
+	<label for="name">What is your name?</label>
+	<input type="text" id="name" name="name" ng-model="name" required />
+	<label for="email">What is your email address?</label>
+	<input type="text" id="email" name="email" ng-model="email" required/>
+	<label for="type">What type of feedback do you have?</label>
+	<select name="type" ng-model="type" id="type">
+		<option value="General Comment">General Comment</option>
+		<option value="Feature Request">Feature Request</option>
+		<option value="Bug Report">Bug Report</option>
+	</select>
+	<label for="comment">What would you like to say?</label>
+	<textarea name="comment" id="comment" ng-model="comment" required placeholder="Write your message..."></textarea>
+	<input type="submit" class="button major" ng-class="{disabled: sending}" value="{{sending ? 'Sending' : 'Send'}}">
+	<p class="success" ng-show="success">Your message has been sent</p>
+	<p class="error" ng-show="success === false">Your message failed to send</p>
+</form>
