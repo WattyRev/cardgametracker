@@ -105,6 +105,11 @@
 	input[type="checkbox"]:checked {
 		background:#485BE7;
 	}
+	input[type="submit"] {
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance:none;
+	}
 
 	select {
 		-webkit-appearance: none;
