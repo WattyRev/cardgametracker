@@ -136,7 +136,7 @@
 		pointer-events: none;
 	}
 	.message {
-		width: 500px;
+		width: 85%;
 		padding: 20px;
 		margin: 0 auto;
 		background: #ECECEC;
@@ -254,7 +254,7 @@
 		transition:.1s;
 		position: absolute;
 		top: 0;
-		left: 0;
+		right: 0;
 	}
 	#manu-button svg{
 		pointer-events: none;
