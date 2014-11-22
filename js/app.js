@@ -252,7 +252,7 @@ app.controller('FeedbackController', ['$scope', '$rootScope', '$http', function(
 			};
 
 			$.ajax({
-				url: 'feedback.php',
+				url: 'http://wattydev.com/projects/game_tracker/feedback.php',
 				method: 'POST',
 				data: post_data,
 				success: function(data, status, headers, config) {
