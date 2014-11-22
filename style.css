@@ -769,4 +769,8 @@
 	#cribbage .players .name {
 		width: 40%!important;
 	}
+	.game-icon {
+		height:0;
+		padding: 18% 35px;
+	}
 }
