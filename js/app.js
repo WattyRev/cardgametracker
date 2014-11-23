@@ -79,8 +79,8 @@ app.config(function($stateProvider, $urlRouterProvider){
 			data: {
 				display: 'Feedback'
 			}
-		})
-})
+		});
+});
 
 //Pages
 
@@ -170,7 +170,7 @@ app.controller('PlayersController', ['$scope', '$rootScope', function(scope, roo
 		show: false,
 		player: {}
 	};
-	scope.name = ''
+	scope.name = '';
 
 	//FUNCTIONS
 	scope.add_player = function() {
@@ -221,13 +221,13 @@ app.controller('PlayersController', ['$scope', '$rootScope', function(scope, roo
 		if (add === true) {
 			$('#input-name').focus();
 		}
-	})
+	});
 	scope.$watch('edit.show', function(show) {
 		if (show === true) {
 			scope.name = scope.edit.player.name;
 			$('#input-name').focus();
 		}
-	})
+	});
 }]);
 
 app.controller('AboutController', ['$scope', '$rootScope', function(scope, root) {
@@ -238,7 +238,7 @@ app.controller('DonateController', ['$scope', '$rootScope', function(scope, root
 
 app.controller('FeedbackController', ['$scope', '$rootScope', '$http', function(scope, root, http) {
 	//VARIABLES
-		scope.type="General Comment"
+		scope.type="General Comment";
 
 	//FUNCTIONS
 		scope.submit = function() {
@@ -259,13 +259,15 @@ app.controller('FeedbackController', ['$scope', '$rootScope', '$http', function(
 					scope.sending = false;
 					scope.success = true;
 					scope.commont = '';
+					scope.$apply();
 				},
 				error: function(data, status, headers, config) {
 					scope.sending = false;
 					scope.success = false;
+					scope.$apply();
 				}
 			});
-		}
+		};
 }]);
 
 //Games
@@ -451,7 +453,7 @@ app.controller('Phase10Controller', ['$scope', '$rootScope', function(scope, roo
 			if (winners.length > 1) {
 				winners.sort(function(a,b) {
 					return a.score - b.score;
-				})
+				});
 			}
 			scope.end_game(winners[0]);
 		}
@@ -492,7 +494,7 @@ app.controller('Phase10Controller', ['$scope', '$rootScope', function(scope, roo
 				player:{
 					name: 'Tie Game'
 				}
-			}
+			};
 			scope.end_game(tie);
 			return;
 		}
@@ -516,7 +518,7 @@ app.controller('Phase10Controller', ['$scope', '$rootScope', function(scope, roo
 				person.dealer = false;
 			}
 			person.rounds.splice(person.rounds.length - 1, 1);
-		})
+		});
 		//revert dealer
 		dealer = dealer - 1;
 		if (dealer < 0) {
@@ -539,7 +541,7 @@ app.controller('Phase10Controller', ['$scope', '$rootScope', function(scope, roo
 			}
 			history.sort(function(a, b) {
 				return new Date(b.date).getTime() - new Date(a.date).getTime();
-			})
+			});
 			localStorage['phase_10_history'] = JSON.stringify(history);
 		}
 	}, true);
@@ -649,7 +651,7 @@ app.controller('UnoController', ['$scope', '$rootScope', function(scope, root) {
 			if (winners.length > 1) {
 				winners.sort(function(a,b) {
 					return a.score - b.score;
-				})
+				});
 			}
 			scope.end_game(winners[0]);
 		}
@@ -686,7 +688,7 @@ app.controller('UnoController', ['$scope', '$rootScope', function(scope, root) {
 				player:{
 					name: 'Tie Game'
 				}
-			}
+			};
 			scope.end_game(tie);
 			return;
 		}
@@ -707,7 +709,7 @@ app.controller('UnoController', ['$scope', '$rootScope', function(scope, root) {
 				person.dealer = false;
 			}
 			person.rounds.splice(person.rounds.length - 1, 1);
-		})
+		});
 		//revert dealer
 		dealer = dealer - 1;
 		if (dealer < 0) {
@@ -730,7 +732,7 @@ app.controller('UnoController', ['$scope', '$rootScope', function(scope, root) {
 			}
 			history.sort(function(a, b) {
 				return new Date(b.date).getTime() - new Date(a.date).getTime();
-			})
+			});
 			localStorage['uno_history'] = JSON.stringify(history);
 		}
 	}, true);
@@ -820,7 +822,7 @@ app.controller('MunchkinController', ['$scope', '$rootScope', function(scope, ro
 				player:{
 					name: 'Tie Game'
 				}
-			}
+			};
 			scope.end_game(tie);
 			return;
 		}
@@ -851,8 +853,8 @@ app.controller('MunchkinController', ['$scope', '$rootScope', function(scope, ro
 			container.addClass('spin');
 			setTimeout(function() {
 				container.removeClass('spin');
-			}, 1000)
-		};
+			}, 1000);
+		}
 		scope.show_die = true;
 	};
 
@@ -870,7 +872,7 @@ app.controller('MunchkinController', ['$scope', '$rootScope', function(scope, ro
 			}
 			history.sort(function(a, b) {
 				return new Date(b.date).getTime() - new Date(a.date).getTime();
-			})
+			});
 			localStorage['munchkin_history'] = JSON.stringify(history);
 		}
 	}, true);
@@ -968,7 +970,7 @@ app.controller('CribbageController', ['$scope', '$rootScope', function(scope, ro
 				player:{
 					name: 'Tie Game'
 				}
-			}
+			};
 			scope.end_game(tie);
 			return;
 		}
@@ -978,7 +980,7 @@ app.controller('CribbageController', ['$scope', '$rootScope', function(scope, ro
 	scope.subtract = function(person) {
 		if (person.points > 0) {
 			person.points--;
-		};
+		}
 	};
 
 	scope.add = function(person) {
@@ -1009,7 +1011,7 @@ app.controller('CribbageController', ['$scope', '$rootScope', function(scope, ro
 		$.each(scope.current_game.scores, function(i, person) {
 			if (!person.scored_hand) {
 				end_round = false;
-				return
+				return;
 			}
 			if (person.dealer && !person.scored_crib) {
 				end_round = false;
@@ -1054,7 +1056,7 @@ app.controller('CribbageController', ['$scope', '$rootScope', function(scope, ro
 			}
 			history.sort(function(a, b) {
 				return new Date(b.date).getTime() - new Date(a.date).getTime();
-			})
+			});
 			localStorage['cribbage_history'] = JSON.stringify(history);
 		}
 	}, true);
@@ -1065,7 +1067,7 @@ app.controller('CribbageController', ['$scope', '$rootScope', function(scope, ro
 app.directive('menu', function() {
 	function link(scope, element, attrs) {
 
-	};
+	}
 	return {
 		restrict: 'E',
 		templateUrl: 'html/menu.html',
@@ -1077,7 +1079,7 @@ app.directive('selectPlayers', function() {
 	function link(scope, element, attrs) {
 		scope.players = JSON.parse(localStorage['players']);
 
-	};
+	}
 	return {
 		restrict: 'E',
 		templateUrl: 'html/select_players.html',
